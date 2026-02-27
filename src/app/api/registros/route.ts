@@ -1,5 +1,23 @@
 import { NextResponse } from "next/server";
+import { DateTime } from "luxon";
 import { getSheetRange, getSheetsClient, getSpreadsheetId } from "@/lib/sheets";
+
+function normalizeFecha(fecha: string): string {
+  const raw = (fecha ?? "").trim();
+  if (!raw) return raw;
+
+  if (/^\d+(?:[.,]\d+)?$/.test(raw)) {
+    const serial = Number(raw.replace(",", "."));
+    if (!Number.isNaN(serial)) {
+      const millis = Date.UTC(1899, 11, 30) + serial * 24 * 60 * 60 * 1000;
+      return DateTime.fromMillis(millis, { zone: "utc" })
+        .setZone("America/Bogota")
+        .toFormat("dd/LL/yyyy HH:mm:ss");
+    }
+  }
+
+  return raw;
+}
 
 export async function GET(req: Request) {
   try {
@@ -26,7 +44,7 @@ export async function GET(req: Request) {
     >();
 
     for (const r of rows.slice(1)) {
-      const fecha = r[0] ?? "";
+      const fecha = normalizeFecha(r[0] ?? "");
       if (!fecha) continue;
       if (!byFecha.has(fecha)) {
         byFecha.set(fecha, {

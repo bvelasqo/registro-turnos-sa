@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 
     const fechaRegistro = DateTime.now()
       .setZone("America/Bogota")
-      .toFormat("yyyy-LL-dd HH:mm:ss");
+      .toFormat("dd/LL/yyyy HH:mm:ss");
 
     const sheets = getSheetsClient();
     const spreadsheetId = getSpreadsheetId();
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: getSheetRange("A:G"),
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: "RAW",
       insertDataOption: "INSERT_ROWS",
       requestBody: { values },
     });

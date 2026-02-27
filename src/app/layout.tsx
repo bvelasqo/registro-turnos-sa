@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Registro Entrega de Turno",
-  description: "Registro de estado por equipo y proceso",
+  description: " ",
 };
 
 export default function RootLayout({
