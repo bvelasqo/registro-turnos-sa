@@ -1,0 +1,24 @@
+export type FixedRow = { proceso: string; equipo: string };
+
+export const FIXED_ROWS: FixedRow[] = [
+  { proceso: "Preparación", equipo: "Tanque de Preparación 5.000 L A" },
+  { proceso: "Preparación", equipo: "Tanque de Preparación 5.000 L B" },
+  { proceso: "Preparación", equipo: "Tanque de Preparación 5.000 L C" },
+  { proceso: "Preparación", equipo: "Tanque de Preparación 1.000 L" },
+  { proceso: "Preparación", equipo: "Tanque de Preparación 150 L" },
+  { proceso: "Almacenamiento", equipo: "Tanque de Almacenamiento 5.000 L A" },
+  { proceso: "Almacenamiento", equipo: "Tanque de Almacenamiento 5.000 L B" },
+  { proceso: "Almacenamiento", equipo: "Tanque de Almacenamiento 5.000 L C" },
+  { proceso: "Almacenamiento", equipo: "Tanque de Almacenamiento 5.000 L D" },
+  { proceso: "Envasado", equipo: "Envasadora Tecnomaco A" },
+  { proceso: "Envasado", equipo: "Envasadora Tecnomaco B" },
+  { proceso: "Envasado", equipo: "Envasadora Tecnomaco C" },
+  { proceso: "Envasado", equipo: "Envasadora Filamatic" },
+  { proceso: "Blisteado", equipo: "Blistera N° 1 (Blisteadora Blipack 204)" },
+  { proceso: "Blisteado", equipo: "Blistera N° 2 (Blisteadora Blipack 2)" },
+  { proceso: "Blisteado", equipo: "Blistera N°3 (Blisteadora Elmach)" },
+  { proceso: "Blisteado", equipo: "Blistera N°4 (Blisteadora Blipack 4)" },
+  { proceso: "Blisteado", equipo: "Blistera N°5 (Blisteadora IMA TR200)" },
+  { proceso: "Blisteado", equipo: "Blistera N°7 (Blisteadora Marchesini MB4521)" },
+  { proceso: "Envasado", equipo: "Contadora de Tabletas" },
+];
