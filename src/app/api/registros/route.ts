@@ -31,7 +31,23 @@ export async function GET(req: Request) {
     });
 
     const rows = resp.data.values ?? [];
-    if (rows.length <= 1) return NextResponse.json({ registros: [] });
+    if (rows.length <= 1) return NextResponse.json({ registros: [], registroActual: null });
+
+    const dataRows = rows
+      .slice(1)
+      .filter((r) => (r[1] ?? "").trim() && (r[2] ?? "").trim());
+
+    const registroActual = {
+      fechaRegistro: normalizeFecha(dataRows[0]?.[0] ?? ""),
+      items: dataRows.map((r) => ({
+        proceso: r[1] ?? "",
+        equipo: r[2] ?? "",
+        producto: r[3] ?? "",
+        lote: r[4] ?? "",
+        estado: r[5] ?? "",
+        observacion: r[6] ?? "",
+      })),
+    };
 
     const byFecha = new Map<
       string,
@@ -43,7 +59,7 @@ export async function GET(req: Request) {
       }
     >();
 
-    for (const r of rows.slice(1)) {
+    for (const r of dataRows) {
       const fecha = normalizeFecha(r[0] ?? "");
       if (!fecha) continue;
       if (!byFecha.has(fecha)) {
@@ -76,7 +92,7 @@ export async function GET(req: Request) {
       .sort((a, b) => (a.fechaRegistro < b.fechaRegistro ? 1 : -1))
       .slice(0, limit);
 
-    return NextResponse.json({ registros });
+    return NextResponse.json({ registros, registroActual });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error inesperado";
     if (msg.includes("Unable to parse range")) {

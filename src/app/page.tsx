@@ -12,6 +12,15 @@ type Recent = {
   count: number;
 };
 
+type CurrentItem = {
+  proceso: string;
+  equipo: string;
+  producto: string;
+  lote: string;
+  estado: string;
+  observacion: string;
+};
+
 const REQUIERE_OBS = new Set(["Detenido", "Falla"]);
 
 export default function Page() {
@@ -37,6 +46,27 @@ export default function Page() {
     const res = await fetch("/api/registros?limit=10");
     const json = await res.json();
     setRecent(json.registros ?? []);
+
+    const incoming: CurrentItem[] = Array.isArray(json.registroActual?.items)
+      ? json.registroActual.items
+      : [];
+
+    if (incoming.length > 0) {
+      setTable((prev) => {
+        const next = { ...prev };
+        for (const item of incoming) {
+          const key = `${item.proceso}||${item.equipo}`;
+          if (!next[key]) continue;
+          next[key] = {
+            producto: item.producto || next[key].producto,
+            lote: item.lote || "",
+            estado: item.estado || next[key].estado,
+            observacion: item.observacion || "",
+          };
+        }
+        return next;
+      });
+    }
   }
 
   useEffect(() => {
@@ -88,7 +118,6 @@ export default function Page() {
       if (!res.ok) return setMsg({ text: json.error ?? "Error al guardar.", ok: false });
 
       setMsg({ text: `✅ Registro guardado: ${json.fechaRegistro}`, ok: true });
-      setTable(initialTable);
       await loadRecent();
     } finally {
       setSaving(false);
@@ -106,15 +135,15 @@ export default function Page() {
   );
 
   return (
-    <main className="mx-auto flex w-full max-w-[1700px] flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
-      <header className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <main className="mx-auto flex w-full max-w-[1850px] flex-col gap-4 px-2 py-3 sm:gap-5 sm:px-3 sm:py-4 md:gap-6 md:px-5 md:py-6 lg:px-6">
+      <header className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm sm:p-4 md:p-5 dark:border-zinc-800 dark:bg-zinc-900">
         <h1 className="text-xl font-bold tracking-tight md:text-2xl">Registro de Entrega de Turno</h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           Selecciona producto y lote por cada equipo, valida observaciones obligatorias y guarda el corte del turno.
         </p>
       </header>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm sm:p-4 md:p-5 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex justify-end">
           <button
             onClick={() => void save()}
@@ -140,10 +169,10 @@ export default function Page() {
 
       <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="border-b border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-800 dark:border-zinc-800 dark:text-zinc-100">
-          Estado de equipos
+          Estado de equipos ({FIXED_ROWS.length})
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full min-w-[1180px] border-collapse text-xs sm:text-sm">
             <thead className="bg-zinc-50 dark:bg-zinc-950/40">
               <tr>
                 {[
@@ -156,7 +185,7 @@ export default function Page() {
                 ].map((h) => (
                   <th
                     key={h.label}
-                    className={`border-b border-zinc-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 ${h.cls}`}
+                    className={`border-b border-zinc-200 px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-zinc-600 sm:px-3 sm:py-3 dark:border-zinc-800 dark:text-zinc-400 ${h.cls}`}
                   >
                     {h.label}
                   </th>
@@ -176,13 +205,13 @@ export default function Page() {
                       {idx === 0 && (
                         <td
                           rowSpan={equipos.length}
-                          className="border-r border-zinc-200 bg-zinc-50 px-4 py-3 align-middle font-semibold text-zinc-800 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-100"
+                            className="border-r border-zinc-200 bg-zinc-50 px-2 py-2 align-middle font-semibold text-zinc-800 sm:px-3 sm:py-3 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-100"
                         >
                           {proceso}
                         </td>
                       )}
-                      <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{equipo}</td>
-                      <td className="px-4 py-2">
+                      <td className="px-2 py-2 text-zinc-700 sm:px-3 sm:py-3 dark:text-zinc-300">{equipo}</td>
+                      <td className="px-2 py-2 sm:px-3">
                         <select
                           value={st.producto}
                           onChange={(e) => setRowField(key, "producto", e.target.value)}
@@ -195,7 +224,7 @@ export default function Page() {
                           ))}
                         </select>
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-2 py-2 sm:px-3">
                         <input
                           value={st.lote}
                           onChange={(e) => setRowField(key, "lote", e.target.value)}
@@ -203,7 +232,7 @@ export default function Page() {
                           className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-950 dark:focus:ring-zinc-800"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-2 py-2 sm:px-3">
                         <select
                           value={st.estado}
                           onChange={(e) => setRowField(key, "estado", e.target.value)}
@@ -220,7 +249,7 @@ export default function Page() {
                           ))}
                         </select>
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-2 py-2 sm:px-3">
                         <input
                           value={st.observacion}
                           onChange={(e) => setRowField(key, "observacion", e.target.value)}
@@ -241,7 +270,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm sm:p-4 md:p-5 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mb-3 flex items-center justify-between gap-2">
           <h2 className="text-base font-bold tracking-tight">Registros recientes</h2>
           <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:text-zinc-300">

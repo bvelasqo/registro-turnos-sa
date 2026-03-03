@@ -70,11 +70,15 @@ export async function POST(req: Request) {
       ];
     });
 
-    await sheets.spreadsheets.values.append({
+    await sheets.spreadsheets.values.clear({
       spreadsheetId,
-      range: getSheetRange("A:G"),
+      range: getSheetRange("A2:G"),
+    });
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: getSheetRange("A2:G"),
       valueInputOption: "RAW",
-      insertDataOption: "INSERT_ROWS",
       requestBody: { values },
     });
 
