@@ -80,52 +80,54 @@ export default function Page() {
   }
 
   async function save() {
-    setMsg(null);
+  setMsg(null);
 
-    for (const r of FIXED_ROWS) {
-      const key = `${r.proceso}||${r.equipo}`;
-      const st = table[key];
-      if (!st.producto.trim()) {
-        return setMsg({ text: `Producto obligatorio en: ${r.equipo}`, ok: false });
-      }
-      if (!st.lote.trim()) {
-        return setMsg({ text: `Lote obligatorio en: ${r.equipo}`, ok: false });
-      }
-      if (REQUIERE_OBS.has(st.estado) && !st.observacion.trim()) {
-        return setMsg({
-          text: `Observación obligatoria para "${st.estado}" en: ${r.equipo}`,
-          ok: false,
-        });
-      }
+  // ── Validaciones ──────────────────────────────────────────
+  for (const r of FIXED_ROWS) {
+    const key = `${r.proceso}||${r.equipo}`;
+    const st = table[key];
+    if (!st.producto.trim()) {
+      return setMsg({ text: `Producto obligatorio en: ${r.equipo}`, ok: false });
     }
-
-    const items = FIXED_ROWS.map((r) => {
-      const key = `${r.proceso}||${r.equipo}`;
-      return {
-        proceso: r.proceso,
-        equipo: r.equipo,
-        ...table[key],
-        lote: table[key].lote.trim(),
-      };
-    });
-
-    setSaving(true);
-    try {
-      const res = await fetch("/api/registro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
+    if (!st.lote.trim()) {
+      return setMsg({ text: `Lote obligatorio en: ${r.equipo}`, ok: false });
+    }
+    if (REQUIERE_OBS.has(st.estado) && !st.observacion.trim()) {
+      return setMsg({
+        text: `Observación obligatoria para "${st.estado}" en: ${r.equipo}`,
+        ok: false,
       });
-      const json = await res.json();
-      if (!res.ok) return setMsg({ text: json.error ?? "Error al guardar.", ok: false });
-
-      setMsg({ text: `✅ Registro guardado: ${json.fechaRegistro}`, ok: true });
-      await loadRecent();
-    } finally {
-      setSaving(false);
     }
   }
 
+  // ── Construye el payload ───────────────────────────────────
+  const items = FIXED_ROWS.map((r) => {
+    const key = `${r.proceso}||${r.equipo}`;
+    return {
+      proceso: r.proceso,
+      equipo: r.equipo,
+      ...table[key],
+      lote: table[key].lote.trim(),
+    };
+  });
+
+  // ── Envía a la API ─────────────────────────────────────────
+  setSaving(true);
+  try {
+    const res = await fetch("/api/registro", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+    const json = await res.json();
+    if (!res.ok) return setMsg({ text: json.error ?? "Error al guardar.", ok: false });
+
+    setMsg({ text: `✅ Registro guardado: ${json.fechaRegistro}`, ok: true });
+    await loadRecent();
+  } finally {
+    setSaving(false);
+  }
+}
   const grouped = FIXED_ROWS.reduce<{ proceso: string; equipos: string[] }[]>(
     (acc, r) => {
       const last = acc[acc.length - 1];
@@ -184,6 +186,7 @@ export default function Page() {
                   { label: "Lote", cls: "w-[12%]" },
                   { label: "Estado", cls: "w-[14%]" },
                   { label: "Observación", cls: "w-[12%]" },
+                  { label: "Turno", cls: "w-[10%]" },
                 ].map((h) => (
                   <th
                     key={h.label}
@@ -243,6 +246,17 @@ export default function Page() {
                               ? "border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-100 dark:border-rose-800 dark:focus:ring-rose-900"
                               : "border-zinc-300 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:focus:ring-zinc-800"
                           }`}
+                          <td className="px-2 py-2 sm:px-3">
+  <select
+    value={st.turno}
+    onChange={(e) => setRowField(key, "turno", e.target.value)}
+    className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-950 dark:focus:ring-zinc-800"
+  >
+    {TURNOS.map((t) => (
+      <option key={t} value={t}>{t}</option>
+    ))}
+  </select>
+</td>
                         >
                           {ESTADOS.map((x) => (
                             <option key={x} value={x}>
