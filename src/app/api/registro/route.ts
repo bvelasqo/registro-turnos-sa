@@ -10,6 +10,7 @@ type Item = {
   lote: string;
   estado: string;
   observacion: string;
+  turno: string; 
 };
 
 const REQUIERE_OBS = new Set(["Detenido", "Falla"]);
@@ -67,6 +68,7 @@ export async function POST(req: Request) {
         (it.lote ?? "").trim(),
         it.estado ?? "",
         it.observacion ?? "",
+        it.turno ?? "",
       ];
     });
 
@@ -77,7 +79,7 @@ export async function POST(req: Request) {
 
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: getSheetRange("A2:G"),
+      range: getSheetRange("A2:H"),
       valueInputOption: "RAW",
       requestBody: { values },
     });
