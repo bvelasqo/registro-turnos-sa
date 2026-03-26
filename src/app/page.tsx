@@ -19,6 +19,7 @@ type CurrentItem = {
   lote: string;
   estado: string;
   observacion: string;
+  turno: string;
 };
 
 const REQUIERE_OBS = new Set(["Detenido", "Falla"]);
