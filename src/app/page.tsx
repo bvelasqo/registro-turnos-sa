@@ -63,6 +63,7 @@ export default function Page() {
             lote: item.lote || "",
             estado: item.estado || next[key].estado,
             observacion: item.observacion || "",
+            turno: TURNOS[0], 
           };
         }
         return next;
