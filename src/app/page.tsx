@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FIXED_ROWS } from "@/lib/fixedRows";
-import { ESTADOS, PRODUCTOS } from "@/lib/options";
+import { ESTADOS, PRODUCTOS,TURNOS } from "@/lib/options";
 
 type RowState = { producto: string; lote: string; estado: string; observacion: string };
 type Recent = {
