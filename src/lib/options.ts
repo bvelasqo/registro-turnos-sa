@@ -11,7 +11,7 @@ export const ESTADOS = [
   "Investigación y desarrollo",
   "Paro por locativos",
 ] as const;
-
+export const TURNOS = ["T1z", "T2z", "T3z"];
 export const PRODUCTOS = [
   "N/A",
   "Acetaminofen 100 mg/mL Gotas",
