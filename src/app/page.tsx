@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FIXED_ROWS } from "@/lib/fixedRows";
 import { ESTADOS, PRODUCTOS,TURNOS } from "@/lib/options";
 
-type RowState = { producto: string; lote: string; estado: string; observacion: string };
+type RowState = { producto: string; lote: string; estado: string; observacion: string; turno: string };
 type Recent = {
   fechaRegistro: string;
   producto: string;
@@ -33,6 +33,7 @@ export default function Page() {
         lote: "",
         estado: ESTADOS[0],
         observacion: "",
+        turno: TURNOS[0],
       };
     });
     return obj;
@@ -246,17 +247,6 @@ export default function Page() {
                               ? "border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-100 dark:border-rose-800 dark:focus:ring-rose-900"
                               : "border-zinc-300 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:focus:ring-zinc-800"
                           }`}
-                          <td className="px-2 py-2 sm:px-3">
-  <select
-    value={st.turno}
-    onChange={(e) => setRowField(key, "turno", e.target.value)}
-    className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-950 dark:focus:ring-zinc-800"
-  >
-    {TURNOS.map((t) => (
-      <option key={t} value={t}>{t}</option>
-    ))}
-  </select>
-</td>
                         >
                           {ESTADOS.map((x) => (
                             <option key={x} value={x}>
@@ -276,6 +266,17 @@ export default function Page() {
                               : "border-zinc-300 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:focus:ring-zinc-800"
                           }`}
                         />
+                      </td>
+                      <td className="px-2 py-2 sm:px-3">
+                        <select
+                          value={st.turno}
+                          onChange={(e) => setRowField(key, "turno", e.target.value)}
+                          className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-950 dark:focus:ring-zinc-800"
+                        >
+                          {TURNOS.map((t) => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
                       </td>
                     </tr>
                   );
